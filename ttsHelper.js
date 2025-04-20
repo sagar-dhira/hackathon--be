@@ -87,7 +87,7 @@ async function convertTextToSpeech(options) {
             text,
             sourceLanguage,
             targetLanguage = 'en',
-            nmtServiceId = 'bhashini/ai4bharat/indic-ner',
+            nmtServiceId = 'bhashini/iiith/nmt-all',
             ttsServiceId = 'Bhashini/IITM/TTS',
             gender = 'male',
             samplingRate = 8000
