@@ -104,7 +104,18 @@ app.post('/translate-pdf', upload.single('file'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ status: 'error', message: 'No PDF file uploaded.' });
     }
+
+    // Get source and target languages from request body
+    const { sourceLanguage, targetLanguage } = req.body;
     
+    // Validate languages
+    if (!sourceLanguage || !targetLanguage) {
+      return res.status(400).json({ 
+        status: 'error', 
+        message: 'Source and target languages are required.' 
+      });
+    }
+
     // Create necessary directories
     const translatedDir = path.join(__dirname, 'translated');
     if (!fs.existsSync(translatedDir)) {
@@ -114,7 +125,12 @@ app.post('/translate-pdf', upload.single('file'), async (req, res) => {
     const inputPdfPath = req.file.path;
     const outputPdfPath = path.join(translatedDir, `translated_${Date.now()}.pdf`);
 
-    await translatePDFWithLayout(inputPdfPath, outputPdfPath);
+    // Pass languages to translation function
+    await translatePDFWithLayout(inputPdfPath, outputPdfPath, {
+      sourceLanguage,
+      targetLanguage,
+      apiKey: API_KEY
+    });
     // Wait for the file to be fully written
     await new Promise(resolve => setTimeout(resolve, 5000)); // Increased to 5s
 
