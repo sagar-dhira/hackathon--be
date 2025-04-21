@@ -20,7 +20,7 @@ const nodemailer = require('nodemailer');
 const emailConfig = require('./email-config');
 // const path = require('path');
 // const fs = require('fs');
-const { translatePDFWithLayout, extractTextElementsFromPDF } = require('./pdfTranslateHelper');
+const { translatePDFWithLayout, extractTextElementsFromPDF, translatePDFWithLayoutEmail } = require('./pdfTranslateHelper');
 const axios = require('axios');
 const { translateImage } = require('./imageTranslateHelper');
 const cors = require('cors');
@@ -193,7 +193,11 @@ app.post('/send-mail', upload.single('document'), async (req, res) => {
 
         // Translate the uploaded document
         const translatedPdfPath = path.join(tempDir, `translated_${Date.now()}.pdf`);
-        await translatePDFWithLayout(req.file.path, translatedPdfPath);
+        await translatePDFWithLayoutEmail(req.file.path, translatedPdfPath, {
+          sourceLanguage: 'mr',
+          targetLanguage: 'hi',
+          // apiKey: API_KEY
+        });
 
         // Wait for the file to be written
         await new Promise((resolve, reject) => {

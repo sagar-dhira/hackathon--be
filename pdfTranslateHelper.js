@@ -103,7 +103,7 @@ async function batchTranslateTextElements(textElements, options = {}) {
 
   if (textStrings.length === 0) return textElements;
 
-  const CHUNK_SIZE = 20;
+  const CHUNK_SIZE = 5;
   const textChunks = [];
   
   for (let i = 0; i < textStrings.length; i += CHUNK_SIZE) {
@@ -300,6 +300,47 @@ async function translatePDFWithLayout(inputPdfPath, outputPdfPath, options = {})
   }
 }
 
+// function  for sendemail pdf
+
+async function translatePDFWithLayoutEmail(inputPdfPath, outputPdfPath, options = {}) {
+    try {
+        const { sourceLanguage = 'en', targetLanguage="mr", apiKey } = options;
+
+        // Only download fonts if needed
+    // if (targetLanguage !== 'en') {
+        //   await ensureDevanagariFont();
+    // }
+
+    // Extract content and metadata
+    const [textElements, pdfDimensions] = await Promise.all([
+      extractTextElementsFromPDF(inputPdfPath),
+      getPDFDimensions(inputPdfPath)
+    ]);
+
+    // Translate the text
+    const translatedElements = await batchTranslateTextElements(textElements, {
+      sourceLanguage,
+      targetLanguage,
+      apiKey
+    });
+
+    // Generate the translated PDF
+    await createTranslatedPDF(
+      translatedElements,
+      pdfDimensions,
+      outputPdfPath,
+      targetLanguage
+    );
+
+    return true;
+  } catch (error) {
+    console.error("PDF translation failed:", error);
+    throw error;
+  }
+}
+
 module.exports = {
-  translatePDFWithLayout
+  translatePDFWithLayout,
+  translatePDFWithLayoutEmail,
+  extractTextElementsFromPDF
 };
